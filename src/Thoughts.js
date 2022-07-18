@@ -6,18 +6,13 @@ import Folder from './components/folder';
 import Thought from './components/thought';
 import NewThought from './components/newThought';
 import Navbar from './components/navbar2';
-import Navbar1 from './components/navbar';
 import Dashboard from './components/dashboard';
 import { gapi } from 'gapi-script';
 import GoogleLogin from 'react-google-login';
-import Thoughts from './Thoughts';
-import Reminders from './Reminders';
-import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 const clientId = '1007332775808-q4j6sklcv5oi9stfl9j35etdvorooj9m.apps.googleusercontent.com';
 
-function App() {
+function Thoughts() {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState([]);
   const [authToken, setAuthToken] = useState(
@@ -227,18 +222,137 @@ function App() {
   // HTML code
   return (
     <>
-      <Navbar1 />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={<Reminders allThoughts={allThoughts} allFolders={allFolders} />}
-          />
-          <Route path="/thoughts" element={<Thoughts />} />
-        </Routes>
-      </BrowserRouter>
+      {localStorage.getItem('authToken') ? (
+        <>
+          <button className="logoutButton" onClick={handleLogout}>
+            logout
+          </button>
+          hi
+          <Navbar userData={userData} allFolders={allFolders} folderPut={folderPut} />
+          <div className="App container-fluid col-md-8 col-lg-6 col-xl-5">
+            <br />
+            <br />
+            {/* DASHBOARD */}
+            {allThoughts.length > 0 &&
+              allThoughts
+                .filter((thought) => thought.dashboard === true)
+                .map((thot, index) => (
+                  <div key={thot.id} className="my-3">
+                    <Dashboard
+                      thoughtPut={thoughtPut}
+                      thought={thot}
+                      folder={thot.folder}
+                      allThoughts={allThoughts}
+                      thoughtDelete={thoughtDelete}
+                      userData={userData}
+                      allFolders={allFolders}
+                    />
+                    <br />
+                  </div>
+                ))}
+            {/* NEW THOUGHT */}
+            <div className="my-3">
+              {allFolders.length > 0 && (
+                <NewThought
+                  newThoughtPost={newThoughtPost}
+                  userData={userData}
+                  allFolders={allFolders}
+                  allThoughts={allThoughts}
+                />
+              )}
+            </div>
+            {/* REMINDERS DASHBOARD */}
+            {allThoughts.length > 0 &&
+              allThoughts
+                .filter(
+                  (thought) => (thought.dashboard !== true) & (thought.folder.name === 'reminders'),
+                )
+                .map((thought, index) => (
+                  <div key={thought.id}>
+                    <Thought
+                      folderPost={folderPost}
+                      thoughtPut={thoughtPut}
+                      thought={thought}
+                      folder={thought.folder}
+                      userData={userData}
+                      allFolders={allFolders}
+                      allThoughts={allThoughts}
+                      thoughtDelete={thoughtDelete}
+                    />
+                  </div>
+                ))}
+            {/* ALL OTHER FOLDERS DASHBOARD */}
+            <br />
+            <br />
+            <br />
+            <div className="borderBottom mb-3"></div>
+            {allFolders.length > 0 &&
+              allFolders
+                .filter((folder) => (folder.dashboard === true) & (folder.name !== 'reminders'))
+                .map((folder, index) => (
+                  <div key={folder.id}>
+                    <Folder
+                      folderPost={folderPost}
+                      thoughtPost={thoughtPost}
+                      thoughtPut={thoughtPut}
+                      folderPut={folderPut}
+                      folderDelete={folderDelete}
+                      thoughtDelete={thoughtDelete}
+                      folder={folder}
+                      userData={userData}
+                      allFolders={allFolders}
+                      allThoughts={allThoughts}
+                    />
+                  </div>
+                ))}
+          </div>
+        </>
+      ) : (
+        <div className="loginContainer">
+          <div className="loginCard">
+            <h2>Welcome to Thought.org!</h2>
+            <p>please log in</p>
+            <img
+              src="https://github.com/swilcox21/Thot.Org/blob/main/src/front/img/looping-down-arrows.gif?raw=true"
+              alt=""
+            />
+            <input
+              type="text"
+              placeholder="username"
+              onChange={(e) => setLoginUsername(e.target.value)}
+            />
+            <br />
+            <br />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="password"
+              onChange={(e) => setLoginPassword(e.target.value)}
+            />
+            <br />
+            <input type="checkbox" onClick={() => setShowPassword(!showPassword)} />
+            <br />
+            <br />
+            <input
+              type="submit"
+              value="LOGIN"
+              onClick={() => getUser(loginUsername, loginPassword)}
+            />
+            <div className="loginButton">
+              {/* <GoogleLogin
+                clientId={clientId}
+                buttonText="Log in with Google"
+                onSuccess={handleLogin}
+                onFailure={handleFailure}
+                cookiePolicy={'single_host_origin'}
+              ></GoogleLogin> */}
+            </div>
+            <br />
+            <small>If you do not have google go away</small>
+          </div>
+        </div>
+      )}
     </>
   );
 }
 
-export default App;
+export default Thoughts;

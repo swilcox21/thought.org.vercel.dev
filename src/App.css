@@ -64,6 +64,14 @@
   z-index: 2;
   background-color: rgb(152, 160, 169);
 }
+
+/* navbar css */
+.navBar1 {
+  border-bottom: 1px solid darkgray;
+  background-color: whitesmoke;
+  text-align: center;
+}
+
 /* dashBoard */
 .submitButton {
   margin-left: 40%;
